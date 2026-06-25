@@ -1,15 +1,3 @@
-"""Deterministic page-fetch layer for scrape-byllm.
-
-Uses Selenium (headless Chrome) instead of requests+BeautifulSoup so the
-fetcher drives a real browser: JS-rendered pages work out of the box, and the
-same live driver can later be reused for write/injection operations (filling
-forms, clicking, executing scripts) as the project scales.
-
-The driver is a lazily-created singleton held in `_driver_holder` and reused
-across calls, so we pay browser-startup cost once. Call `quit_driver()` to tear
-it down (the entry point in main.jac does this on exit).
-"""
-
 import from selenium { webdriver }
 import from selenium.webdriver.chrome.options { Options }
 
