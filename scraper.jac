@@ -30,7 +30,6 @@ def get_driver() -> any {
         opts.add_argument("--disable-gpu");
         opts.add_argument("--window-size=1920,1080");
         opts.add_argument("--user-agent=scrape-byllm/0.1");
-        # opt out of static type checking until jac supports selenium types
         driver: any = webdriver.Chrome(options=opts);
         driver.set_page_load_timeout(30);
         _driver_holder.append(driver);
