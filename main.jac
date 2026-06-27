@@ -203,6 +203,53 @@ def get_all_code(source: any, query: str = "", opts: dict = {}) -> dict {
 }
 
 
+"""Structured synthesis of raw scrape snippets, produced by a single LLM call."""
+obj Synthesis {
+    has summary: str;
+    has items: list[str];
+    has notes: str = "";
+}
+
+sem Synthesis = "A structured synthesis of raw scrape results produced by a single LLM call after scraping.";
+sem Synthesis.summary = "Concise paragraph summarising what was found relative to the original query.";
+sem Synthesis.items = "Discrete extracted items inferred from the query — e.g. names, prices, module names, URLs. Empty list if nothing relevant was found.";
+sem Synthesis.notes = "Any caveats, ambiguities, or follow-up suggestions from the model. Empty string if none.";
+
+
+"""Read the flat snippet text from every scraped page and extract the
+information the user is after, inferring intent from the original query.
+Return a clean, structured synthesis without fabricating facts not present
+in the snippets."""
+def synthesize_results(
+    query: str,
+    thing: str,
+    snippets: str
+) -> Synthesis by llm(temperature=0.2);
+
+
+def _has_flag(args: list[str], flags: list[str]) -> bool {
+    for f in flags {
+        if f in args {
+            return True;
+        }
+    }
+    return False;
+}
+
+def _collect_snippets(out: dict[str, any]) -> str {
+    parts: list[str] = [];
+    results: list[any] = list(out.get("results", []));
+    for result in results {
+        result_any: any = result;
+        src: str = str(result_any.get("source", ""));
+        snippets: list[any] = list(result_any.get("snippets", []));
+        for snippet in snippets {
+            parts.append("[" + src + "] " + str(snippet));
+        }
+    }
+    return "\n".join(parts);
+}
+
 def _resolve_output_path(args: list[str]) -> str {
     makedirs("data", exist_ok=True);
     i: int = 0;
@@ -218,10 +265,25 @@ def _resolve_output_path(args: list[str]) -> str {
 with entry {
     load_dotenv();
 
-    out = get_all_prices(
+    out: dict[str, any] = get_all_prices(
         source="https://docs.oracle.com/javase/8/docs/api/javax/crypto/package-summary.html",
         query="get all crypto modules exposed by this library"
     );
+
+    if _has_flag(argv, ["--synthesize", "-s"]) {
+        flat: str = _collect_snippets(out);
+        synthesis: Synthesis = synthesize_results(
+            query=str(out.get("query", "")),
+            thing=str(out.get("thing", "")),
+            snippets=flat
+        );
+        out["synthesis"] = {
+            "summary": synthesis.summary,
+            "items":   synthesis.items,
+            "notes":   synthesis.notes
+        };
+        print("synthesis:", synthesis.summary);
+    }
 
     out_path: str = _resolve_output_path(argv);
     with open(out_path, "w") as f {
