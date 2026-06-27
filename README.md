@@ -1,4 +1,4 @@
-# scrape-byllm
+# scrape-byLLM
 
 An LLM-planned, regex-executed web scraper, written in [Jac](https://jaseci.org)
 with [byLLM](https://pypi.org/project/byllm/).
@@ -24,7 +24,7 @@ uv pip install -e .
 pip install -e .
 ```
 
-This installs the `scrape_byllm` package and its dependencies (jaclang, byllm,
+This installs the `scrape_byLLM` package and its dependencies (jaclang, byllm,
 selenium, requests, beautifulsoup4, lxml, python-dotenv).
 
 ## Setup
@@ -50,7 +50,7 @@ jac run main.jac
 
 ```jac
 import from dotenv { load_dotenv }
-import from scrape_byllm.scraper { get_all_prices, quit_driver }
+import from scrape_byLLM.scraper { get_all_prices, quit_driver }
 
 with entry {
     load_dotenv();
@@ -66,8 +66,8 @@ with entry {
 
 ### The API
 
-Import any `get_all_*` helper from `scrape_byllm.scraper` (or directly from
-`scrape_byllm`):
+Import any `get_all_*` helper from `scrape_byLLM.scraper` (or directly from
+`scrape_byLLM`):
 
 ```
 get_all(thing, source, query="", opts={})   # generic
@@ -122,9 +122,9 @@ Result shape:
 
 | module                    | responsibility                                          |
 |---------------------------|---------------------------------------------------------|
-| `scrape_byllm/presets`    | Built-in regex table, keyed by `thing` (pure data).     |
-| `scrape_byllm/fetch`      | Page acquisition: HTTP + headless browser + normalize.  |
-| `scrape_byllm/executor`   | Deterministic regex execution (the per-page work).      |
-| `scrape_byllm/planner`    | The LLM brain: plan compilation + optional synthesis.   |
-| `scrape_byllm/output`     | The write-to-disk hook.                                 |
-| `scrape_byllm/scraper`    | Orchestration + the public `get_all_*` API.             |
+| `scrape_byLLM/presets`    | Built-in regex table, keyed by `thing` (pure data).     |
+| `scrape_byLLM/fetch`      | Page acquisition: HTTP + headless browser + normalize.  |
+| `scrape_byLLM/executor`   | Deterministic regex execution (the per-page work).      |
+| `scrape_byLLM/planner`    | The LLM brain: plan compilation + optional synthesis.   |
+| `scrape_byLLM/output`     | The write-to-disk hook.                                 |
+| `scrape_byLLM/scraper`    | Orchestration + the public `get_all_*` API.             |

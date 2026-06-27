@@ -14,7 +14,7 @@ keywords = ["scraping", "llm", "jac", "byLLM", "regex"]
 
 dependencies = [
     "jaclang>=0.16.7",
-    "byLLM>=0.6.17",
+    "byllm>=0.6.17",
     "selenium>=4.27.0",
     "requests>=2.31.0",
     "beautifulsoup4>=4.12.0",
