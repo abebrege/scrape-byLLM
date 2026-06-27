@@ -110,7 +110,6 @@ def dispatch(target: Target, url: str, query: str) -> list[str] {
 }
 
 
-# Renders a list of Table objects as pipe-delimited plain text.
 def format_tables(tables: list[Table]) -> str {
     lines: list[str] = [];
     for t in tables {

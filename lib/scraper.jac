@@ -3,12 +3,9 @@ import from selenium.webdriver.chrome.options { Options }
 
 glob MAX_CHARS: int = 40000;
 
-# Single-element holder for the singleton driver. We mutate it in place rather
-# than rebinding a glob so no `global` declaration is needed inside functions.
 glob _driver_holder: list[any] = [];
 
 
-# Return the shared headless-Chrome driver, creating it on first use.
 def get_driver() -> any {
     if not _driver_holder {
         opts = Options();
@@ -29,7 +26,6 @@ def get_driver() -> any {
 def fetch_page(url: str) -> str {
     driver: any = get_driver();
     driver.get(url);
-    # Strip noise in-browser and read the JS-rendered DOM back out.
     clean_js = "for (const el of document.querySelectorAll('script, style, noscript')) { el.remove(); } return document.documentElement.outerHTML;";
     html: str = str(driver.execute_script(clean_js));
     if len(html) > MAX_CHARS {
@@ -39,7 +35,6 @@ def fetch_page(url: str) -> str {
 }
 
 
-# Shut down the shared driver and release the holder.
 def quit_driver() {
     if _driver_holder {
         _driver_holder[0].quit();
