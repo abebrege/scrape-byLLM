@@ -3,7 +3,7 @@ import from scrape_byLLM.presets { preset_table }
 
 glob llm = Model(model_name="anthropic/claude-sonnet-4-6");
 
-glob _PLAN_CACHE: dict = {};
+glob _PLAN_CACHE: dict[str, RegexPlan] = {};
 
 
 """A compiled, reusable extraction plan. Produced once by the LLM, cached and
@@ -63,7 +63,7 @@ def synthesize_results(
 
 
 def get_plan(thing: str, query: str, sample_html: str) -> RegexPlan {
-    key = thing + "::" + query;
+    key: str = thing + "::" + query;
     if key not in _PLAN_CACHE {
         plan: RegexPlan = compile_query_to_plan(
             thing, query, sample_html[:6000], preset_table()
