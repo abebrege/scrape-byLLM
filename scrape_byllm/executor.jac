@@ -1,7 +1,8 @@
-"""
-Takes a RegexPlan, applies each pattern to the
-appropriate surface (HTML or stripped text), and returns ±window character snippets
-around every match.
+"""Deterministic regex execution.
+
+Takes a RegexPlan, applies each pattern to the appropriate surface (raw HTML or
+stripped visible text), and returns ±window-character snippets around every
+match. No LLM calls happen here — this is the part that runs N times per scrape.
 """
 
 import from re { compile, IGNORECASE, sub }

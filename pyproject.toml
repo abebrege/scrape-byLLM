@@ -1,0 +1,32 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scrape-byllm"
+version = "0.1.0"
+description = "LLM-planned, regex-executed web scraper. One LLM call compiles a reusable plan; every page after is pure regex."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "abebrege" }]
+keywords = ["scraping", "llm", "jac", "byllm", "regex"]
+
+dependencies = [
+    "jaclang>=0.16.7",
+    "byllm>=0.6.17",
+    "selenium>=4.27.0",
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+# Ship the Jac sources as package data so jaclang's import hook can load them
+# once installed (`import from scrape_byllm.scraper { ... }`).
+packages = ["scrape_byllm"]
+include = ["scrape_byllm/**/*.jac"]
+
+[tool.hatch.build.targets.sdist]
+include = ["scrape_byllm/**/*.jac", "main.jac", "jac.toml", "README.md"]
