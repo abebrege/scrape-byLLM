@@ -10,12 +10,12 @@ fetch -> planner -> executor (determine regex byLLM) -> [synthesize byLLM] -> [w
 ## Install
 
 Requires Python ≥ 3.11 and Google Chrome (only for `render=True` pages).
-
 ```bash
-# with uv
-uv pip install -e .
 
-# or with pip
+uv pip install -e .
+```
+or
+```bash
 pip install -e .
 ```
 
@@ -73,7 +73,7 @@ get_all_charts / get_all_code                # one preset per "thing"
 
 - **source** — a URL, a list of URLs, raw HTML, or plain text (mixed lists are fine).
 - **query** — optional natural-language description. When given, the LLM compiles
-  a custom plan; when omitted, the built-in preset regex for that `thing` is used
+  a custom plan. When omitted, the built-in preset regex for that `thing` is used
   (no LLM call).
 
 ### Options (`opts`)
@@ -112,14 +112,3 @@ Result shape:
   "synthesis": { "summary": "...", "items": ["..."], "notes": "..." }
 }
 ```
-
-## Package layout
-
-| module                    | responsibility                                          |
-|---------------------------|---------------------------------------------------------|
-| `scrape_byLLM/presets`    | Built-in regex table, keyed by `thing` (pure data).     |
-| `scrape_byLLM/fetch`      | Page acquisition: HTTP + headless browser + normalize.  |
-| `scrape_byLLM/executor`   | Deterministic regex execution (the per-page work).      |
-| `scrape_byLLM/planner`    | The LLM brain: plan compilation + optional synthesis.   |
-| `scrape_byLLM/output`     | The write-to-disk hook.                                 |
-| `scrape_byLLM/scraper`    | Orchestration + the public `get_all_*` API.             |
