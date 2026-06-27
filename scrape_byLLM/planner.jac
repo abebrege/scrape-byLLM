@@ -33,7 +33,7 @@ obj Synthesis {
 
 sem Synthesis = "A structured synthesis of raw scrape results produced by a single LLM call after scraping.";
 sem Synthesis.summary = "Concise paragraph summarising what was found relative to the original query.";
-sem Synthesis.items = "Discrete extracted items inferred from the query — e.g. names, prices, module names, URLs. Empty list if nothing relevant was found.";
+sem Synthesis.items = "Discrete extracted items inferred from the query — e.g. names, prices, module names, URLs. Empty list if nopattern relevant was found.";
 sem Synthesis.notes = "Any caveats, ambiguities, or follow-up suggestions from the model. Empty string if none.";
 
 
@@ -44,7 +44,7 @@ Prefer selecting and lightly parameterizing a pattern from `available_regexes`.
 If the target is a semantic content category that HTML structure cannot reliably
 """
 def compile_query_to_plan(
-    thing: str,
+    pattern: str,
     query: str,
     sample_html: str,
     available_regexes: dict[str, str]
@@ -57,16 +57,16 @@ Return a clean, structured synthesis without fabricating facts not present
 in the snippets."""
 def synthesize_results(
     query: str,
-    thing: str,
+    pattern: str,
     snippets: str
 ) -> Synthesis by llm(temperature=0.2);
 
 
-def get_plan(thing: str, query: str, sample_html: str) -> RegexPlan {
-    key: str = thing + "::" + query;
+def get_plan(pattern: str, query: str, sample_html: str) -> RegexPlan {
+    key: str = pattern + "::" + query;
     if key not in _PLAN_CACHE {
         plan: RegexPlan = compile_query_to_plan(
-            thing, query, sample_html[:6000], preset_table()
+            pattern, query, sample_html[:6000], preset_table()
         );
         _PLAN_CACHE[key] = plan;
     }
@@ -74,15 +74,15 @@ def get_plan(thing: str, query: str, sample_html: str) -> RegexPlan {
 }
 
 
-def preset_plan(thing: str) -> RegexPlan {
+def preset_plan(pattern: str) -> RegexPlan {
     regexes: dict[str, str] = preset_table();
-    pat: str = str(regexes.get(thing, ""));
+    pat: str = str(regexes.get(pattern, ""));
     pats: list[str] = [];
     if pat {
         pats = [pat];
     }
     surface: str = "text";
-    if thing != "text" {
+    if pattern != "text" {
         surface = "html";
     }
     return RegexPlan(

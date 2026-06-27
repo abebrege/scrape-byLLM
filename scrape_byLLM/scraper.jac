@@ -4,10 +4,10 @@ import from scrape_byLLM.planner { get_plan, preset_plan, synthesize_results }
 import from scrape_byLLM.output { write_output }
 
 
-def spawn_scrape(thing: str, source: any, query: str, opts: dict) -> dict {
+def spawn_scrape(pattern: str, source: any, query: str, opts: dict) -> dict {
     sources: list[dict] = normalize_source(source);
     llm_calls: int = 0;
-    plan: any = preset_plan(thing);
+    plan: any = preset_plan(pattern);
     results: list = [];
 
     if sources {
@@ -15,7 +15,7 @@ def spawn_scrape(thing: str, source: any, query: str, opts: dict) -> dict {
         first_html: str = _get_html(first_src, opts);
 
         if query {
-            plan = get_plan(thing, query, first_html);
+            plan = get_plan(pattern, query, first_html);
             llm_calls = 1;
         }
         first_snippets: list[str] = extract(plan, first_html);
@@ -36,7 +36,7 @@ def spawn_scrape(thing: str, source: any, query: str, opts: dict) -> dict {
     }
 
     out: dict = {
-        "thing":      thing,
+        "pattern":      pattern,
         "query":      query,
         "strategy":   plan.strategy,
         "on":         plan.on,
@@ -48,7 +48,7 @@ def spawn_scrape(thing: str, source: any, query: str, opts: dict) -> dict {
 
     if bool(opts.get("synthesize", False)) {
         flat: str = _collect_snippets(out);
-        synthesis: any = synthesize_results(query, thing, flat);
+        synthesis: any = synthesize_results(query, pattern, flat);
         out["synthesis"] = {
             "summary": synthesis.summary,
             "items":   synthesis.items,
@@ -97,46 +97,46 @@ def _collect_snippets(out: dict[str, any]) -> str {
 }
 
 
-def get_all(thing: str, source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing=thing, source=source, query=query, opts=opts);
+def get_all(pattern: str, source: any, query: str = "", opts: dict = {}) -> dict {
+    return spawn_scrape(pattern=pattern, source=source, query=query, opts=opts);
 }
 
 def get_all_links(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="links", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="links", source=source, query=query, opts=opts);
 }
 
 def get_all_images(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="images", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="images", source=source, query=query, opts=opts);
 }
 
 def get_all_prices(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="prices", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="prices", source=source, query=query, opts=opts);
 }
 
 def get_all_emails(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="emails", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="emails", source=source, query=query, opts=opts);
 }
 
 def get_all_phones(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="phones", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="phones", source=source, query=query, opts=opts);
 }
 
 def get_all_tables(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="tables", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="tables", source=source, query=query, opts=opts);
 }
 
 def get_all_headings(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="headings", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="headings", source=source, query=query, opts=opts);
 }
 
 def get_all_text(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="text", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="text", source=source, query=query, opts=opts);
 }
 
 def get_all_charts(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="charts", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="charts", source=source, query=query, opts=opts);
 }
 
 def get_all_code(source: any, query: str = "", opts: dict = {}) -> dict {
-    return spawn_scrape(thing="code", source=source, query=query, opts=opts);
+    return spawn_scrape(pattern="code", source=source, query=query, opts=opts);
 }

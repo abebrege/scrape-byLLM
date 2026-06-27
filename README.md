@@ -65,15 +65,15 @@ Import any `get_all_*` helper from `scrape_byLLM.scraper` (or directly from
 `scrape_byLLM`):
 
 ```
-get_all(thing, source, query="", opts={})   # generic
+get_all(pattern, source, query="", opts={})   # generic
 get_all_links / get_all_images / get_all_prices / get_all_emails /
 get_all_phones / get_all_tables / get_all_headings / get_all_text /
-get_all_charts / get_all_code                # one preset per "thing"
+get_all_charts / get_all_code                # one preset per "pattern"
 ```
 
 - **source** — a URL, a list of URLs, raw HTML, or plain text (mixed lists are fine).
 - **query** — optional natural-language description. When given, the LLM compiles
-  a custom plan. When omitted, the built-in preset regex for that `thing` is used
+  a custom plan. When omitted, the built-in preset regex for that `pattern` is used
   (no LLM call).
 
 ### Options (`opts`)
@@ -88,7 +88,7 @@ get_all_charts / get_all_code                # one preset per "thing"
 
 ### Output
 
-Every call **returns a dict** and writes nothing by default. Writing is an opt-in
+Every call **returns a dict** and writes nopattern by default. Writing is an opt-in
 side effect via `opts["output"]` — the returned value is identical either way:
 
 ```jac
@@ -101,7 +101,7 @@ Result shape:
 
 ```json
 {
-  "thing": "prices",
+  "pattern": "prices",
   "query": "...",
   "strategy": "preset | custom",
   "on": "html | text",

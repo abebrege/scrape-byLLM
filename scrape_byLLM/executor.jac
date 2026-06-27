@@ -1,3 +1,7 @@
+# TODO: `compile`, `IGNORECASE`, and `sub` come from Python's stdlib `re`, which
+# Jac resolves dynamically at runtime — they arrive untyped (as `any`). That's why
+# the checker can't verify their signatures, and why downstream values such as
+# `compile(...).finditer(...)` and `sub(...).strip()` also fall back to `any`.
 import from re { compile, IGNORECASE, sub }
 import from bs4 { BeautifulSoup }
 
