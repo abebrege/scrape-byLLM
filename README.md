@@ -1,15 +1,10 @@
 # scrape-byLLM
 
-An LLM-planned, regex-executed web scraper, written in [Jac](https://jaseci.org)
+A library for web scraping, written in [Jac](https://jaseci.org)
 with [byLLM](https://pypi.org/project/byllm/).
 
-The model is called **once** per `(thing, query)` pair to compile a reusable
-extraction plan. That plan is then applied deterministically to every page with
-plain regex. Scraping N pages costs **1 LLM call + (N-1) pure-regex passes** —
-the cost does not grow with the number of pages.
-
 ```
-fetch ──▶ planner (1 LLM call) ──▶ executor (regex × N) ──▶ [synthesize] ──▶ [write]
+fetch -> planner -> executor (determine regex byLLM) -> [synthesize byLLM] -> [write]
 ```
 
 ## Install
