@@ -2,8 +2,6 @@ import from requests { get }
 import from selenium { webdriver }
 import from selenium.webdriver.chrome.options { Options }
 
-glob MAX_CHARS: int = 40000;
-
 glob _driver_holder: list[any] = [];
 
 
@@ -24,13 +22,13 @@ def _get_driver() -> any {
 }
 
 
-def _fetch_rendered(url: str) -> str {
+def _fetch_rendered(url: str, max_chars: int = 40000) -> str {
     driver: any = _get_driver();
     driver.get(url);
     clean_js = "for (const el of document.querySelectorAll('script, style, noscript')) { el.remove(); } return document.documentElement.outerHTML;";
     html: str = str(driver.execute_script(clean_js));
-    if len(html) > MAX_CHARS {
-        return html[:MAX_CHARS];
+    if len(html) > max_chars {
+        return html[:max_chars];
     }
     return html;
 }
@@ -54,18 +52,18 @@ def quit_driver() {
 }
 
 
-def fetch_one(url: str, render: bool = False, timeout: int = 20) -> str {
+def fetch_one(url: str, render: bool = False, timeout: int = 20, max_chars: int = 40000) -> str {
     if render {
-        return _fetch_rendered(url);
+        return _fetch_rendered(url, max_chars);
     }
     return _http_get(url, timeout);
 }
 
 
-def fetch_many(urls: list[str], render: bool = False, timeout: int = 20) -> list[dict] {
+def fetch_many(urls: list[str], render: bool = False, timeout: int = 20, max_chars: int = 40000) -> list[dict] {
     results: list[dict] = [];
     for url in urls {
-        html: str = fetch_one(url, render, timeout);
+        html: str = fetch_one(url, render, timeout, max_chars);
         results.append({"url": url, "html": html});
     }
     return results;
