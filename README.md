@@ -54,7 +54,7 @@ with entry {
     scraper.set("synthesize", True);
     scraper.set("output", "data/out.json");
 
-    out: dict = scraper.get_all_prices(
+    out: dict = scraper.get_all(
         source="https://en.wikipedia.org/wiki/Population_density",
         query="return the population of each country from the tables on this page"
     );
