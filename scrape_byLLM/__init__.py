@@ -1,0 +1,180 @@
+from __future__ import annotations
+
+import sys
+from typing import Any, Optional, Union
+
+__version__ = "0.1.0"
+__all__ = ["ScrapeByLLM"]
+
+
+def _bootstrap_jaclang() -> None:
+    """Register jaclang's meta-path importer if it isn't already present."""
+    try:
+        from jaclang.meta_importer import JacMetaImporter  # type: ignore[import]
+    except ImportError as exc:
+        raise ImportError(
+            "jaclang is required — install it with: pip install jaclang"
+        ) from exc
+    if any(isinstance(f, JacMetaImporter) for f in sys.meta_path):
+        return
+    sys.meta_path.insert(0, JacMetaImporter())
+
+
+_bootstrap_jaclang()
+
+from scrape_byLLM.scraper import ScrapeByLLM as _JacScrapeByLLM  # type: ignore[import]
+
+
+class ScrapeByLLM:
+    """
+    One LLM call compiles a reusable extraction plan for a given
+    ``(pattern, query)`` pair; every subsequent page runs pure regex — no
+    further LLM calls.
+
+    Can be used as a context manager; ``quit()`` is called automatically on
+    exit to release the headless-browser driver (only relevant when
+    ``render=True``).
+
+    Args:
+        window: Context characters captured on each side of a regex match.
+        max_chars: Maximum page characters forwarded to the LLM.
+        timeout: Per-request HTTP timeout in seconds.
+        render: Use headless Chrome instead of ``requests`` (for JS pages).
+        dedup: Drop duplicate snippets within each page.
+        synthesize: Run an extra LLM pass that returns a structured summary.
+        output: Write the result dict as JSON to this path (side-effect only).
+        html_sample_size: Characters of raw HTML sampled for plan compilation.
+        respect_robots: Honour ``robots.txt`` — disallowed URLs are skipped.
+        user_agent: HTTP ``User-Agent`` header value.
+        extra_headers: Additional HTTP headers merged into every request.
+        rate_limit: Minimum seconds between consecutive HTTP requests.
+    """
+
+    def __init__(
+        self,
+        *,
+        window: int = 200,
+        max_chars: int = 40_000,
+        timeout: int = 20,
+        render: bool = False,
+        dedup: bool = True,
+        synthesize: bool = False,
+        output: Optional[str] = None,
+        html_sample_size: int = 6_000,
+        respect_robots: bool = True,
+        user_agent: str = "scrape-byLLM",
+        extra_headers: Optional[dict[str, str]] = None,
+        rate_limit: float = 0.0,
+    ) -> None:
+        self._impl = _JacScrapeByLLM()
+        _cfg: dict[str, Any] = {
+            "window": window,
+            "max_chars": max_chars,
+            "timeout": timeout,
+            "render": render,
+            "dedup": dedup,
+            "synthesize": synthesize,
+            "output": output,
+            "html_sample_size": html_sample_size,
+            "respect_robots": respect_robots,
+            "user_agent": user_agent,
+            "extra_headers": extra_headers or {},
+            "rate_limit": rate_limit,
+        }
+        for key, val in _cfg.items():
+            self._impl.set(key, val)
+
+    def __enter__(self) -> "ScrapeByLLM":
+        return self
+
+    def __exit__(self, *_: Any) -> None:
+        self.quit()
+
+    def set(self, key: str, val: Any) -> None:
+        self._impl.set(key, val)
+
+    def get(self, key: str) -> Any:
+        return self._impl.get(key)
+
+    def get_all(
+        self,
+        source: Union[str, list[str]],
+        query: str = "",
+    ) -> dict[str, Any]:
+        """For general queries, will generate a pattern by LLM and extract all matches.
+        Use the following methods for more specific queries, as they are optimized for those tasks:
+        - get_all_links
+        - get_all_images
+        - get_all_prices
+        - get_all_emails
+        - get_all_phones
+        - get_all_tables
+        - get_all_headings
+        - get_all_text
+        - get_all_charts
+        - get_all_code
+        """
+        return dict(self._impl.get_all(source=source, query=query))
+
+    def get_all_links(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Extract ``<a href>`` URLs."""
+        return dict(self._impl.get_all_links(source=source, query=query))
+
+    def get_all_images(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Extract ``<img src>`` URLs."""
+        return dict(self._impl.get_all_images(source=source, query=query))
+
+    def get_all_prices(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Extract price strings (``$``, ``€``, ``£``, ``¥``)."""
+        return dict(self._impl.get_all_prices(source=source, query=query))
+
+    def get_all_emails(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Extract e-mail addresses."""
+        return dict(self._impl.get_all_emails(source=source, query=query))
+
+    def get_all_phones(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Extract phone numbers."""
+        return dict(self._impl.get_all_phones(source=source, query=query))
+
+    def get_all_tables(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Extract ``<table>`` blocks."""
+        return dict(self._impl.get_all_tables(source=source, query=query))
+
+    def get_all_headings(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Extract ``<h1>``–``<h6>`` headings."""
+        return dict(self._impl.get_all_headings(source=source, query=query))
+
+    def get_all_text(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Return the full visible text of each page."""
+        return dict(self._impl.get_all_text(source=source, query=query))
+
+    def get_all_charts(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Extract ``<canvas>`` and ``<svg>`` blocks."""
+        return dict(self._impl.get_all_charts(source=source, query=query))
+
+    def get_all_code(
+        self, source: Union[str, list[str]], query: str = ""
+    ) -> dict[str, Any]:
+        """Extract ``<code>`` and ``<pre>`` blocks."""
+        return dict(self._impl.get_all_code(source=source, query=query))
+
+    def quit(self) -> None:
+        self._impl.quit()
