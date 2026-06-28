@@ -25,7 +25,7 @@ def dedup(items: list[str]) -> list[str] {
 }
 
 
-def extract(plan: any, html: str) -> list[str] {
+def extract(plan: any, html: str, window: int = -1) -> list[str] {
     haystack: str = "";
     if plan.on == "text" {
         haystack = strip_to_text(html);
@@ -35,6 +35,9 @@ def extract(plan: any, html: str) -> list[str] {
 
     hay_len: int = len(haystack);
     radius: int = int(plan.window);
+    if window >= 0 {
+        radius = window;
+    }
     out: list[str] = [];
 
     for pat in plan.patterns {
