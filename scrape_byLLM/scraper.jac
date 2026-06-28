@@ -16,26 +16,33 @@ def spawn_scrape(pattern: str, source: any, query: str, opts: dict) -> dict {
 
     if sources {
         first_src: any = sources[0];
-        first_html: str = _get_html(first_src, opts);
-
-        if query {
-            plan = get_plan(pattern, query, first_html, html_sample_size);
-            llm_calls = 1;
+        try {
+            first_html: str = _get_html(first_src, opts);
+            if query {
+                plan = get_plan(pattern, query, first_html, html_sample_size);
+                llm_calls = 1;
+            }
+            first_snippets: list[str] = extract(plan, first_html, window);
+            if bool(opts.get("dedup", True)) {
+                first_snippets = dedup(first_snippets);
+            }
+            results.append({"source": _source_label(first_src), "snippets": first_snippets});
+        } except Exception as e {
+            results.append({"source": _source_label(first_src), "snippets": [], "error": str(e)});
         }
-        first_snippets: list[str] = extract(plan, first_html, window);
-        if bool(opts.get("dedup", True)) {
-            first_snippets = dedup(first_snippets);
-        }
-        results.append({"source": _source_label(first_src), "snippets": first_snippets});
 
         for src in sources[1:] {
             src_any: any = src;
-            html: str = _get_html(src_any, opts);
-            snippets: list[str] = extract(plan, html, window);
-            if bool(opts.get("dedup", True)) {
-                snippets = dedup(snippets);
+            try {
+                html: str = _get_html(src_any, opts);
+                snippets: list[str] = extract(plan, html, window);
+                if bool(opts.get("dedup", True)) {
+                    snippets = dedup(snippets);
+                }
+                results.append({"source": _source_label(src_any), "snippets": snippets});
+            } except Exception as e {
+                results.append({"source": _source_label(src_any), "snippets": [], "error": str(e)});
             }
-            results.append({"source": _source_label(src_any), "snippets": snippets});
         }
     }
 
@@ -73,8 +80,12 @@ def _get_html(src: any, opts: dict) -> str {
     render: bool = bool(opts.get("render", False));
     timeout: int = int(opts.get("timeout", 20));
     max_chars: int = int(opts.get("max_chars", 40000));
+    respect_robots: bool = bool(opts.get("respect_robots", True));
+    user_agent: str = str(opts.get("user_agent", "scrape-byLLM"));
+    extra_headers: dict = dict(opts.get("extra_headers", {}));
+    rate_limit: float = float(opts.get("rate_limit", 0.0));
     url: str = str(src.get("url", ""));
-    return fetch_one(url, render, timeout, max_chars);
+    return fetch_one(url, render, timeout, max_chars, respect_robots, user_agent, extra_headers, rate_limit);
 }
 
 
@@ -114,7 +125,11 @@ obj ScrapeByLLM {
             "dedup":            True,
             "synthesize":       False,
             "output":           None,
-            "html_sample_size": 6000
+            "html_sample_size": 6000,
+            "respect_robots":   True,
+            "user_agent":       "scrape-byLLM",
+            "extra_headers":    {},
+            "rate_limit":       0.0,
         };
     }
 
@@ -177,7 +192,7 @@ obj ScrapeByLLM {
 }
 
 sem ScrapeByLLM = "Stateful scraper instance. Configure once with .set(), then call .get_all_*() for each target — the compiled plan is reused across pages.";
-sem ScrapeByLLM._env = "Runtime configuration. Keys: window (int, default 200), max_chars (int, default 40000), timeout (int, default 20), render (bool, default False), dedup (bool, default True), synthesize (bool, default False), output (str|None, default None), html_sample_size (int, default 6000).";
+sem ScrapeByLLM._env = "Runtime configuration. Keys: window, max_chars, timeout, render, dedup, synthesize, output, html_sample_size, respect_robots, user_agent, extra_headers, rate_limit.";
 
 
 def get_all(pattern: str, source: any, query: str = "", opts: dict = {}) -> dict {
