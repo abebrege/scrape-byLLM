@@ -62,11 +62,11 @@ def synthesize_results(
 ) -> Synthesis by llm(temperature=0.2);
 
 
-def get_plan(pattern: str, query: str, sample_html: str) -> RegexPlan {
+def get_plan(pattern: str, query: str, sample_html: str, html_sample_size: int = 6000) -> RegexPlan {
     key: str = pattern + "::" + query;
     if key not in _PLAN_CACHE {
         plan: RegexPlan = compile_query_to_plan(
-            pattern, query, sample_html[:6000], preset_table()
+            pattern, query, sample_html[:html_sample_size], preset_table()
         );
         _PLAN_CACHE[key] = plan;
     }
