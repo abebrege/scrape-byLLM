@@ -7,8 +7,8 @@ name = "scrape-byLLM"
 version = "0.1.0"
 description = "LLM-planned, regex-executed web scraper. One LLM call compiles a reusable plan; every page after is pure regex."
 readme = "README.md"
-requires-python = ">=3.11"
-license = { text = "MIT" }
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
 authors = [{ name = "abebrege" }]
 keywords = ["scraping", "llm", "jac", "byLLM", "regex"]
 
@@ -22,11 +22,37 @@ dependencies = [
     "python-dotenv>=1.0.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "responses>=0.25",
+    "ruff>=0.4",
+    "mypy>=1.10",
+]
+
 [tool.hatch.build.targets.wheel]
-# Ship the Jac sources as package data so jaclang's import hook can load them
-# once installed (`import from scrape_byLLM.scraper { ... }`).
+# Ship both the Jac implementation and the Python facade.
 packages = ["scrape_byLLM"]
 include = ["scrape_byLLM/**/*.jac"]
 
 [tool.hatch.build.targets.sdist]
-include = ["scrape_byLLM/**/*.jac", "main.jac", "jac.toml", "README.md"]
+include = [
+    "scrape_byLLM/**/*.jac",
+    "scrape_byllm/**/*.py",
+    "main.jac",
+    "jac.toml",
+    "README.md",
+    "LICENSE",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
