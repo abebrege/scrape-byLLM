@@ -1,6 +1,7 @@
 import from scrape_byLLM.fetch { fetch_one, normalize_source, quit_driver }
 import from scrape_byLLM.executor { extract, dedup }
-import from scrape_byLLM.planner { get_plan, preset_plan, synthesize_results }
+import from scrape_byLLM.planner { get_plan, preset_plan, synthesize_results, choose_pattern }
+import from scrape_byLLM.presets { preset_table }
 import from scrape_byLLM.output { write_output }
 
 
@@ -125,8 +126,9 @@ obj ScrapeByLLM {
         return self._env.get(key);
     }
 
-    def get_all(pattern: str, source: any, query: str = "") -> dict {
-        return spawn_scrape(pattern=pattern, source=source, query=query, opts=self._env);
+    def get_all(source: any, query: str) -> dict {
+        pattern: any = choose_pattern(query, list(preset_table().keys()));
+        return spawn_scrape(pattern=str(pattern), source=source, query=query, opts=self._env);
     }
 
     def get_all_links(source: any, query: str = "") -> dict {

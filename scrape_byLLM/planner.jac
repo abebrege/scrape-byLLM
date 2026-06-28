@@ -37,6 +37,12 @@ sem Synthesis.items = "Discrete extracted items inferred from the query — e.g.
 sem Synthesis.notes = "Any caveats, ambiguities, or follow-up suggestions from the model. Empty string if none.";
 
 
+"""Return the single pattern name from available_patterns that best matches
+what the user wants to extract. Return exactly one name from the list — no
+explanation, no punctuation."""
+def choose_pattern(query: str, available_patterns: list[str]) -> str by llm(temperature=0.0);
+
+
 """
 Decide how to extract the requested query from html.
 
