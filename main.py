@@ -12,6 +12,44 @@ URL = "https://en.wikipedia.org/wiki/Population_density"
 QUERY = "return the population of each country from the tables on this page"
 MODEL = "claude-sonnet-4-6"
 OUTPUT_FILE = "data/comparison_out.json"
+MAX_CHARS = 200000
+HTML_SAMPLE_SIZE = 6000
+
+ITEMS_FORMAT = "one per country in 'Country: population' format"
+
+SYNTHESIS_SCHEMA = (
+    "Return ONLY a JSON object with:\n"
+    "  summary: string summarising what was found\n"
+    f"  items: list of strings, {ITEMS_FORMAT}\n"
+    "  notes: string (caveats or empty string)\n"
+    "No markdown, no explanation — raw JSON only."
+)
+
+OUTPUT_SCHEMA = (
+    "Return ONLY a JSON object with these exact fields:\n"
+    "  pattern: string (type of data extracted, e.g. 'tables')\n"
+    "  query: string (the original query, verbatim)\n"
+    "  strategy: string ('preset' or 'custom')\n"
+    "  on: string ('html' or 'text')\n"
+    "  patterns: list of strings (regex patterns used, or empty list)\n"
+    "  results: list containing one object with:\n"
+    "    source: the URL string\n"
+    "    snippets: list of strings, one per extracted row/item\n"
+    "  synthesis: object with:\n"
+    "    summary: string summarising what was found\n"
+    f"    items: list of strings, {ITEMS_FORMAT}\n"
+    "    notes: string (caveats or empty string)\n\n"
+    "No markdown, no explanation — raw JSON only."
+)
+
+PLAN_SCHEMA = (
+    "Return ONLY a JSON object with these fields:\n"
+    "  strategy: 'preset' or 'custom'\n"
+    "  patterns: list of Python re-compatible regex strings\n"
+    "  on: 'html' or 'text'\n"
+    "  window: int (characters of context each side of a match)\n"
+    "  notes: string (brief rationale, empty if none)"
+)
 
 _client = anthropic.Anthropic()
 
@@ -38,20 +76,7 @@ def via_anthropic_direct() -> dict:
                     f"Fetch this webpage and extract the requested data.\n\n"
                     f"URL: {URL}\n"
                     f"Query: {QUERY}\n\n"
-                    f"Return ONLY a JSON object with these exact fields:\n"
-                    f"  pattern: string (type of data extracted, e.g. 'tables')\n"
-                    f"  query: string (the original query, verbatim)\n"
-                    f"  strategy: string ('preset' or 'custom')\n"
-                    f"  on: string ('html' or 'text')\n"
-                    f"  patterns: list of strings (regex patterns used, or empty list)\n"
-                    f"  results: list containing one object with:\n"
-                    f"    source: the URL string\n"
-                    f"    snippets: list of strings, one per extracted row/item\n"
-                    f"  synthesis: object with:\n"
-                    f"    summary: string summarising what was found\n"
-                    f"    items: list of strings, one per country in 'Country: population' format\n"
-                    f"    notes: string (caveats or empty string)\n\n"
-                    f"No markdown, no explanation — raw JSON only."
+                    f"{OUTPUT_SCHEMA}"
                 ),
             }
         ],
@@ -74,10 +99,6 @@ def via_byllm() -> dict:
 def via_direct_byllm() -> dict:
     from scrape_byLLM.direct_byllm import fetch_and_extract  # type: ignore[import]
     return fetch_and_extract(url=URL, query=QUERY, max_chars=MAX_CHARS)
-
-
-MAX_CHARS = 200000
-HTML_SAMPLE_SIZE = 6000
 
 
 def via_direct_pipeline() -> dict:
@@ -107,12 +128,7 @@ def via_direct_pipeline() -> dict:
     plan_data = _llm_json(
         f"Decide how to extract the requested query from HTML.\n"
         f"Prefer selecting and lightly parameterising a pattern from available_regexes.\n"
-        f"Return ONLY a JSON object with these fields:\n"
-        f"  strategy: 'preset' or 'custom'\n"
-        f"  patterns: list of Python re-compatible regex strings\n"
-        f"  on: 'html' or 'text'\n"
-        f"  window: int (characters of context each side of a match)\n"
-        f"  notes: string (brief rationale, empty if none)\n\n"
+        f"{PLAN_SCHEMA}\n\n"
         f"pattern: {pattern}\n"
         f"query: {QUERY}\n"
         f"available_regexes: {json.dumps(presets)}\n"
@@ -134,7 +150,7 @@ def via_direct_pipeline() -> dict:
         f"Read the flat snippet text from every scraped page and extract the information "
         f"the user is after. Infer intent from the original query. Return a clean, structured "
         f"synthesis without fabricating facts not present in the snippets.\n"
-        f"Return ONLY a JSON object with: summary (string), items (list of strings), notes (string).\n\n"
+        f"{SYNTHESIS_SCHEMA}\n\n"
         f"query: {QUERY}\npattern: {pattern}\nsnippets:\n{flat}",
         max_tokens=8096,
     )
