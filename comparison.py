@@ -3,9 +3,12 @@ import json
 import requests
 import anthropic
 from types import SimpleNamespace
+from dotenv import load_dotenv
 
 from scrape_byLLM import ScrapeByLLM
 from comparison_parameters import ComparisonParams
+
+load_dotenv()
 
 MODEL = "claude-sonnet-4-6"
 MAX_CHARS = 200000
