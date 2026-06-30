@@ -71,6 +71,10 @@ def via_byllm() -> dict:
         return scraper.get_all(source=URL, query=QUERY)
 
 
+MAX_CHARS = 200000
+HTML_SAMPLE_SIZE = 6000
+
+
 def via_direct_pipeline() -> dict:
     from scrape_byLLM.executor import extract, dedup  # type: ignore[import]
     from scrape_byLLM.presets import preset_table  # type: ignore[import]
@@ -94,7 +98,7 @@ def via_direct_pipeline() -> dict:
     if pattern not in presets:
         pattern = "text"
 
-    html = requests.get(URL, headers={"User-Agent": "scrape-byLLM"}, timeout=20).text
+    html = requests.get(URL, headers={"User-Agent": "scrape-byLLM"}, timeout=20).text[:MAX_CHARS]
     plan_data = _llm_json(
         f"Decide how to extract the requested query from HTML.\n"
         f"Prefer selecting and lightly parameterising a pattern from available_regexes.\n"
@@ -107,8 +111,8 @@ def via_direct_pipeline() -> dict:
         f"pattern: {pattern}\n"
         f"query: {QUERY}\n"
         f"available_regexes: {json.dumps(presets)}\n"
-        f"sample_html:\n{html[:6000]}",
-        max_tokens=1024,
+        f"sample_html:\n{html[:HTML_SAMPLE_SIZE]}",
+        max_tokens=4096,
     )
     plan = SimpleNamespace(
         strategy=plan_data.get("strategy", "custom"),
@@ -126,8 +130,8 @@ def via_direct_pipeline() -> dict:
         f"the user is after. Infer intent from the original query. Return a clean, structured "
         f"synthesis without fabricating facts not present in the snippets.\n"
         f"Return ONLY a JSON object with: summary (string), items (list of strings), notes (string).\n\n"
-        f"query: {QUERY}\npattern: {pattern}\nsnippets:\n{flat[:20000]}",
-        max_tokens=2048,
+        f"query: {QUERY}\npattern: {pattern}\nsnippets:\n{flat}",
+        max_tokens=8096,
     )
 
     return {
