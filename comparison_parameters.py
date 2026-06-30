@@ -18,6 +18,7 @@ class ComparisonParams:
 
 
 COMPARISONS: dict[str, ComparisonParams] = {
+    # --- Baseline -----------------------------------------------------------------
     "population_density": ComparisonParams(
         name="population_density",
         url="https://en.wikipedia.org/wiki/Population_density",
@@ -30,18 +31,26 @@ COMPARISONS: dict[str, ComparisonParams] = {
             "Structural failure is a partial list that looks complete."
         ),
     ),
+    # --- Category 1: Disambiguation among near-identical candidates ---------------
+    # books.toscrape product pages carry both "Price (excl. tax)" and "Price (incl. tax)"
+    # rows in the Product Information table. "What is the price?" forces a which-field choice;
+    # both values are valid price strings so the schema never flags the wrong pick.
     "price_disambiguation": ComparisonParams(
         name="price_disambiguation",
-        url="https://en.wikipedia.org/wiki/PlayStation_5",
-        query="what is the price of the PlayStation 5?",
-        items_format="one per SKU or regional variant in 'Variant: price (currency)' format",
+        url="https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+        query="what is the price of this book?",
+        items_format="one per price field in 'Field name: price value' format (e.g. 'Price (excl. tax): £51.77')",
         category=1,
         failure_type="semantic",
         description=(
-            "Multiple prices on-page: launch price, disc edition, digital edition, regional variants. "
-            "Model must surface all variants rather than picking one confidently."
+            "Product Information table has two price rows (excl. and incl. tax). "
+            "Both are valid price strings; only context determines which the user wants. "
+            "Sandbox page — stable, legal, no auth required."
         ),
     ),
+    # --- Category 2: Values that must be computed, not lifted ---------------------
+    # Concorde's speed is given in km/h and Mach; mph requires a conversion not on the page.
+    # Regex-plan can extract the raw km/h figure but cannot derive the mph answer.
     "computed_value": ComparisonParams(
         name="computed_value",
         url="https://en.wikipedia.org/wiki/Concorde",
@@ -54,6 +63,9 @@ COMPARISONS: dict[str, ComparisonParams] = {
             "not present on the page. Regex-plan can extract the raw number but cannot derive mph."
         ),
     ),
+    # --- Category 3: Tables with merged cells / multi-level headers ---------------
+    # Wikipedia GDP table uses multi-level column headers (source organisation × projection year)
+    # with colspan. Markdown flattening destroys the cell-to-header mapping.
     "merged_table_headers": ComparisonParams(
         name="merged_table_headers",
         url="https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)",
@@ -67,54 +79,92 @@ COMPARISONS: dict[str, ComparisonParams] = {
             "from roughly the right region of the table."
         ),
     ),
+    # --- Category 4: Dispersed / extract-all on long pages ------------------------
+    # books.toscrape has 1,000 books across 50 pages of 20. Asking for all titles+prices
+    # on the root page tests whether the model truncates and returns a plausible partial list.
     "dispersed_extract_all": ComparisonParams(
         name="dispersed_extract_all",
-        url="https://en.wikipedia.org/wiki/List_of_Academy_Award_for_Best_Picture_winners",
-        query="return all Best Picture Oscar winners from 2010 to 2024",
-        items_format="one per year in 'Year: Film Title' format",
+        url="https://books.toscrape.com/",
+        query="return all book titles and their prices from this catalogue page",
+        items_format="one per book in 'Title: price' format",
         category=4,
         failure_type="both",
         description=(
-            "15 entries dispersed across a very long table. "
-            "Classic truncation failure: model returns a partial list that looks complete."
+            "1,000 books across 50 paginated pages. Single-page fetch returns 20 items; "
+            "correct answer acknowledges pagination. Classic truncation failure: model returns "
+            "the first ~20 as if the list were complete."
         ),
     ),
+    # --- Category 5: Absent data the page doesn't contain ------------------------
+    # books.toscrape Product Information table has UPC, Product Type, two prices, Tax,
+    # Availability, and Number of reviews — but no ISBN field (verified). Correct answer is
+    # NOT FOUND. Failure mode is fabricating a plausible-looking number string.
     "absent_data": ComparisonParams(
         name="absent_data",
-        url="https://en.wikipedia.org/wiki/Albert_Einstein",
-        query="what is Albert Einstein's email address and phone number?",
+        url="https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+        query="what is the ISBN of this book?",
         items_format="one per requested field in 'Field: value' format, or 'Field: NOT FOUND' if absent",
         category=5,
         failure_type="semantic",
         description=(
-            "Requested fields do not exist anywhere on the page. Correct answer is null/not-found. "
-            "Failure is fabrication of a plausible-looking value — structurally valid, semantically catastrophic."
+            "Product Information table has UPC but no ISBN field. Correct answer is NOT FOUND. "
+            "Failure is fabricating a plausible numeric string — structurally valid, semantically catastrophic. "
+            "Cleanest demonstration of the structural/semantic gap."
         ),
     ),
+    # --- Category 6: Implicit / relational data -----------------------------------
+    # Same books.toscrape product page: "author" is not a labeled field in the table but
+    # appears in the prose description ('...from Shel Silverstein...'). Tests inference
+    # from running text rather than field lookup.
     "implicit_relational": ComparisonParams(
         name="implicit_relational",
-        url="https://en.wikipedia.org/wiki/OpenAI",
-        query="who founded OpenAI and who is the current CEO?",
-        items_format="one per person in 'Role: Name' format",
+        url="https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+        query="who is the author of this book?",
+        items_format="one entry: 'Author: <full name>'",
         category=6,
         failure_type="semantic",
         description=(
-            "CEO role may be described implicitly ('leads as chief executive'). "
-            "Requires distinguishing co-founder from current leader; regex-plan cannot resolve this."
+            "Author is not a labeled field in the Product Information table but is named in "
+            "the prose description. Tests inference from running text; regex-plan cannot resolve this."
         ),
     ),
+    # --- Category 7: Visually / positionally encoded data -------------------------
+    # books.toscrape renders star ratings as a CSS class (e.g. 'star-rating Three') with no
+    # numeric text in the DOM at all. Text/markdown extraction has nothing to grab; the raw
+    # HTML requires knowing that 'Three' → 3.
+    "visual_encoding": ComparisonParams(
+        name="visual_encoding",
+        url="https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+        query="what is the star rating of this book?",
+        items_format="one entry: 'Star rating: <numeric value> out of 5'",
+        category=7,
+        failure_type="semantic",
+        description=(
+            "Star rating is encoded as a CSS class ('star-rating Three') with no numeric text in the DOM. "
+            "Markdown/text extraction returns nothing; raw HTML requires resolving the word-to-digit mapping."
+        ),
+    ),
+    # --- Category 8: Internationalisation and format ambiguity -------------------
+    # German Wikipedia uses European number formatting: period as thousands separator,
+    # comma as decimal (e.g. '293.628' = 293,628 not 293.628). A US-compiled regex or
+    # naive model normalisation silently mis-parses the value.
     "format_ambiguity": ComparisonParams(
         name="format_ambiguity",
-        url="https://en.wikipedia.org/wiki/Volkswagen",
+        url="https://de.wikipedia.org/wiki/Volkswagen",
         query="what is Volkswagen's annual revenue in euros for the most recent reported year?",
-        items_format="one entry: 'Revenue: <normalized numeric value> EUR (year: <year>, raw: <original string>)'",
+        items_format="one entry: 'Revenue: <full normalized integer, e.g. 293628000000> EUR (year: <year>, raw: <original string from page>)'",
         category=8,
         failure_type="semantic",
         description=(
-            "European financial figures use period-as-thousands-separator and comma-as-decimal "
-            "(e.g. 293.000 = 293,000 not 293.0). Tests whether the model normalizes or silently mis-parses."
+            "German Wikipedia uses European number formatting (period as thousands separator, "
+            "comma as decimal). A value like '293.628' means 293,628 — not 293.628. "
+            "Tests whether the model normalizes or silently mis-parses the locale."
         ),
     ),
+    # --- Category 9: Distractor contamination ------------------------------------
+    # Wikipedia 2020 election page contains dozens of vote percentages: state-level results,
+    # Electoral College tallies, third-party candidates. Model must return the top-line
+    # national popular vote share, not a state figure or an opponent's number.
     "distractor_contamination": ComparisonParams(
         name="distractor_contamination",
         url="https://en.wikipedia.org/wiki/2020_United_States_presidential_election",
