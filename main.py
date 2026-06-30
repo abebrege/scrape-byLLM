@@ -27,17 +27,31 @@ def _llm_json(prompt: str, max_tokens: int = 1024) -> dict:
     return json.loads(m.group()) if m else {}
 
 
-def via_anthropic_direct() -> str:
+def via_anthropic_direct() -> dict:
     response = _client.messages.create(
         model=MODEL,
         max_tokens=4096,
-        thinking={"type": "adaptive"},
         messages=[
             {
                 "role": "user",
                 "content": (
-                    f"Please fetch and analyse this webpage: {URL}\n\n"
-                    f"Task: {QUERY}"
+                    f"Fetch this webpage and extract the requested data.\n\n"
+                    f"URL: {URL}\n"
+                    f"Query: {QUERY}\n\n"
+                    f"Return ONLY a JSON object with these exact fields:\n"
+                    f"  pattern: string (type of data extracted, e.g. 'tables')\n"
+                    f"  query: string (the original query, verbatim)\n"
+                    f"  strategy: string ('preset' or 'custom')\n"
+                    f"  on: string ('html' or 'text')\n"
+                    f"  patterns: list of strings (regex patterns used, or empty list)\n"
+                    f"  results: list containing one object with:\n"
+                    f"    source: the URL string\n"
+                    f"    snippets: list of strings, one per extracted row/item\n"
+                    f"  synthesis: object with:\n"
+                    f"    summary: string summarising what was found\n"
+                    f"    items: list of strings, one per country in 'Country: population' format\n"
+                    f"    notes: string (caveats or empty string)\n\n"
+                    f"No markdown, no explanation — raw JSON only."
                 ),
             }
         ],
@@ -47,7 +61,9 @@ def via_anthropic_direct() -> str:
     for block in response.content:
         if block.type == "text":
             parts.append(block.text)
-    return "\n".join(parts)
+    text = "\n".join(parts)
+    m = re.search(r"\{[\s\S]*\}", text)
+    return json.loads(m.group()) if m else {"raw": text}
 
 
 def via_byllm() -> dict:
@@ -153,7 +169,7 @@ if __name__ == "__main__":
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(output, f, indent=2, ensure_ascii=False)
 
-    print(f"\n--- Direct Anthropic output ---\n{direct_result}\n")
+    print(f"\n--- Direct Anthropic output ---\n{json.dumps(direct_result, indent=2)}\n")
     print(f"--- byLLM output ---\n{json.dumps(byllm_result, indent=2)}\n")
     print(f"--- Direct pipeline output ---\n{json.dumps(pipeline_result, indent=2)}\n")
     print(f"Results written to {OUTPUT_FILE}")
