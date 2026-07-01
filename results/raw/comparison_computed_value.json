@@ -1,0 +1,133 @@
+{
+  "url": "https://en.wikipedia.org/wiki/Concorde",
+  "query": "what was Concorde's maximum speed in miles per hour?",
+  "model": "claude-sonnet-4-6",
+  "category": 2,
+  "failure_type": "semantic",
+  "description": "Speed is given in km/h and Mach; the answer in mph requires a unit conversion not present on the page. Regex-plan can extract the raw number but cannot derive mph.",
+  "direct_anthropic": {
+    "pattern": "specifications table",
+    "query": "what was Concorde's maximum speed in miles per hour?",
+    "strategy": "custom",
+    "on": "text",
+    "patterns": [
+      "(maximum speed|top speed|mach|mph|km/h)",
+      "Maximum speed:\\s*[\\d,]+\\s*mph"
+    ],
+    "results": [
+      {
+        "source": "https://en.wikipedia.org/wiki/Concorde",
+        "snippets": [
+          "Maximum speed: 1,354 mph (2,179 km/h, 1,177 kn)",
+          "Maximum speed: Mach 2.04 (temperature limited)",
+          "Cruise speed: 1,341 mph (2,158 km/h, 1,165 kn)",
+          "average cruise speed of Mach 2.02 (2,150 km/h; 1,330 mph), more than twice the speed of conventional aircraft",
+          "limited the top speed to Mach 2.02"
+        ]
+      }
+    ],
+    "synthesis": {
+      "summary": "According to the Wikipedia article's specifications section, Concorde's maximum speed was 1,354 mph (equivalent to Mach 2.04, or 2,179 km/h / 1,177 knots), described as temperature-limited due to aerodynamic heating constraining the aluminium airframe. Its average operational cruise speed was slightly lower at Mach 2.02 (approximately 1,330–1,338 mph).",
+      "items": [
+        "Maximum speed: 1,354 mph (converted from Mach 2.04 / 2,179 km/h)"
+      ],
+      "notes": "The article distinguishes between the absolute maximum speed of 1,354 mph (Mach 2.04, temperature-limited) and the typical cruise speed of ~1,330–1,341 mph (Mach 2.02). Both figures are drawn from the aircraft's official performance specifications on Wikipedia."
+    }
+  },
+  "byllm": {
+    "pattern": "text",
+    "query": "what was Concorde's maximum speed in miles per hour?",
+    "strategy": "custom",
+    "on": "text",
+    "patterns": [
+      "\\b1[,.]?3[0-9]{2}\\s*(?:mph|miles per hour)",
+      "\\b(?:maximum|top|cruise|cruising)\\s+speed\\b[^.]{0,100}\\b(?:mph|miles per hour)",
+      "\\b(?:mph|miles per hour)\\b"
+    ],
+    "page_count": 1,
+    "llm_calls": 2,
+    "fetch_hits": 0,
+    "fetch_misses": 1,
+    "blocked_urls": 0,
+    "pages_crawled": 0,
+    "results": [
+      {
+        "source": "https://en.wikipedia.org/wiki/Concorde",
+        "snippets": [
+          ") shaped wings [ 10 ] Variable engine air intake ramp system controlled by digital computers [ 71 ] Supercruise capability [ 72 ] For weight-saving and enhanced performance: Mach 2.02 (~2,154 km/h or 1,338 mph) cruising speed [ 73 ] for optimum fuel consumption (supersonic drag minimum and turbojet engines are more efficient at higher speed); [ 74 ] fuel consumption at Mach 2 (2,120 km/h; 1,320 mph) and at",
+          "km/h or 1,338 mph) cruising speed [ 73 ] for optimum fuel consumption (supersonic drag minimum and turbojet engines are more efficient at higher speed); [ 74 ] fuel consumption at Mach 2 (2,120 km/h; 1,320 mph) and at altitude of 60,000 feet (18,000 m) was 4,800 US gallons per hour (18,000 L/h). [ 75 ] Mainly aluminium construction using a high-temperature alloy similar to that developed for aero-engine pi",
+          "upersonic flight time on the transatlantic routes was just under 3.5 hours. Concorde had a maximum cruising altitude of 18,300 metres (60,000 ft) and an average cruise speed of Mach 2.02 (2,150 km/h; 1,330 mph), more than twice the speed of conventional aircraft. [ 128 ] With no other civil traffic operating at its cruising altitude of about 56,000 ft (17,000 m), Concorde had exclusive use of dedicated oce",
+          "aircraft to examine the low-speed performance of the slender delta, a contract that eventually produced the Handley Page HP.115 . [ 13 ] This aircraft demonstrated safe control at speeds as low as 69 mph (111 km/h), about one-third that of the F-104 Starfighter. [ 15 ] Lift is not generated the same way at supersonic and subsonic speeds, with the lift-to-drag ratio for supersonic designs being about ",
+          "ed wings [ 10 ] Variable engine air intake ramp system controlled by digital computers [ 71 ] Supercruise capability [ 72 ] For weight-saving and enhanced performance: Mach 2.02 (~2,154 km/h or 1,338 mph) cruising speed [ 73 ] for optimum fuel consumption (supersonic drag minimum and turbojet engines are more efficient at higher speed); [ 74 ] fuel consumption at Mach 2 (2,120 km/h; 1,320 mph) and at",
+          "r 1,338 mph) cruising speed [ 73 ] for optimum fuel consumption (supersonic drag minimum and turbojet engines are more efficient at higher speed); [ 74 ] fuel consumption at Mach 2 (2,120 km/h; 1,320 mph) and at altitude of 60,000 feet (18,000 m) was 4,800 US gallons per hour (18,000 L/h). [ 75 ] Mainly aluminium construction using a high-temperature alloy similar to that developed for aero-engine pi",
+          "] Each engine had its own intake and the nacelles were paired with a splitter plate between them to minimise the chance of one powerplant influencing the other. Only above Mach 1.6 (1,960 km/h; 1,220 mph) was an engine surge likely to affect the adjacent engine. [ 93 ] The air intake design for Concorde's engines was especially critical. [ 96 ] The intakes had to slow down supersonic inlet air to sub",
+          "nic flight time on the transatlantic routes was just under 3.5 hours. Concorde had a maximum cruising altitude of 18,300 metres (60,000 ft) and an average cruise speed of Mach 2.02 (2,150 km/h; 1,330 mph), more than twice the speed of conventional aircraft. [ 128 ] With no other civil traffic operating at its cruising altitude of about 56,000 ft (17,000 m), Concorde had exclusive use of dedicated oce",
+          "ck at low speeds than conventional aircraft, but it allowed the formation of large low-pressure vortices over the entire upper wing surface, maintaining lift. [ 136 ] The normal landing speed was 170 miles per hour (274 km/h). [ 137 ] Because of this high angle, during a landing approach Concorde was on th"
+        ]
+      }
+    ],
+    "synthesis": {
+      "summary": "According to Wikipedia's article on Concorde, the aircraft had a maximum cruising speed of Mach 2.02, which is approximately 2,154 km/h or 1,338 mph. An average cruise speed figure of 1,330 mph (Mach 2.02 / 2,150 km/h) is also cited in another passage. These figures represent cruising speed optimised for fuel efficiency rather than an absolute top speed record.",
+      "items": [
+        "Mach 2.02",
+        "~1,338 mph (2,154 km/h) — cruising speed for optimum fuel consumption",
+        "~1,330 mph (2,150 km/h) — average cruise speed cited separately"
+      ],
+      "notes": "The snippets consistently describe Concorde's 'maximum cruising speed' rather than an absolute top speed. The slight variation between 1,330 mph and 1,338 mph appears to reflect rounding differences across different passages in the same Wikipedia article. Concorde's absolute maximum speed (e.g. during test flights) may have been higher but is not mentioned in these snippets."
+    }
+  },
+  "direct_byllm": {
+    "pattern": "text_search",
+    "query": "what was Concorde's maximum speed in miles per hour?",
+    "strategy": "custom",
+    "on": "text",
+    "patterns": [
+      "(?i)mach\\s*2\\.\\d+[^.]*mph",
+      "(?i)\\d[,\\d]*\\s*mph[^.]*supersonic",
+      "(?i)speed[^.]*\\d[,\\d]*\\s*(?:mph|miles per hour)",
+      "(?i)\\d[,\\d]*\\s*(?:mph|miles per hour)[^.]*speed"
+    ],
+    "results": [
+      {
+        "source": "https://en.wikipedia.org/wiki/Concorde",
+        "snippets": [
+          "Mach 2.02 (~2,154 km/h or 1,338 mph) cruising speed for optimum fuel consumption (supersonic drag minimum and turbojet engines are more efficient at higher speed); fuel consumption at Mach 2 (2,120 km/h; 1,320 mph) and at altitude of 60,000 feet (18,000 m) was 4,800 US gallons per hour (18,000 L/h).",
+          "Concorde had a maximum cruising altitude of 18,300 metres (60,000 ft) and an average cruise speed of Mach 2.02 (2,150 km/h; 1,330 mph), more than twice the speed of conventional aircraft.",
+          "The normal landing speed was 170 miles per hour (274 km/h)."
+        ]
+      }
+    ],
+    "synthesis": {
+      "summary": "According to the Wikipedia article on Concorde, the aircraft's cruising speed was Mach 2.02, which is approximately 1,330–1,338 mph (2,150–2,154 km/h). This was its operational maximum cruise speed. The article does not separately state a higher absolute maximum speed distinct from the cruise speed, as Mach 2.02 represented both the design cruise and effective top speed in service.",
+      "items": [
+        "Concorde cruise speed: Mach 2.02 (~1,338 mph / 2,154 km/h)",
+        "Concorde average cruise speed (flight characteristics section): Mach 2.02 (1,330 mph / 2,150 km/h)",
+        "Concorde fuel consumption speed reference: Mach 2 (1,320 mph / 2,120 km/h)",
+        "Concorde normal landing speed: 170 mph (274 km/h)"
+      ],
+      "notes": "The article gives slightly varying mph figures for Mach 2.02 in different sections (1,330 mph and 1,338 mph), likely due to rounding. The top speed cited is the cruising speed; no separate higher maximum speed figure is provided in the extracted HTML content."
+    }
+  },
+  "direct_pipeline": {
+    "pattern": "text",
+    "query": "what was Concorde's maximum speed in miles per hour?",
+    "strategy": "preset",
+    "on": "text",
+    "patterns": [
+      ""
+    ],
+    "page_count": 1,
+    "llm_calls": 3,
+    "results": [
+      {
+        "source": "https://en.wikipedia.org/wiki/Concorde",
+        "snippets": []
+      }
+    ],
+    "synthesis": {
+      "summary": "No snippet content was provided to extract information from.",
+      "items": [],
+      "notes": "The snippets field was empty. No data was available to retrieve Concorde's maximum speed."
+    }
+  }
+}

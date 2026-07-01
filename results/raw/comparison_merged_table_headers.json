@@ -1,0 +1,121 @@
+{
+  "url": "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)",
+  "query": "what is the GDP of Germany, France, and Japan according to the IMF?",
+  "model": "claude-sonnet-4-6",
+  "category": 3,
+  "failure_type": "semantic",
+  "description": "GDP table uses multi-level column headers (source × year) with colspan. Markdown flattening destroys cell-to-header mapping; model returns a value from roughly the right region of the table.",
+  "direct_anthropic": {
+    "pattern": "tables",
+    "query": "what is the GDP of Germany, France, and Japan according to the IMF?",
+    "strategy": "custom",
+    "on": "text",
+    "patterns": [
+      "\\| (Germany|France|Japan) \\| ([\\d,]+) \\|",
+      "IMF \\((\\d{4})\\)"
+    ],
+    "results": [
+      {
+        "source": "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)",
+        "snippets": [
+          "| Germany | 5,452,858 | 4,685,593 | 4,659,929 |",
+          "| Japan | 4,379,253 | 4,027,598 | 4,026,211 |",
+          "| France | 3,596,094 | 3,160,443 | 3,160,443 |"
+        ]
+      }
+    ],
+    "synthesis": {
+      "summary": "The Wikipedia page 'List of countries by GDP (nominal)' contains a table of GDP estimates by country from the IMF (2026 forecast), World Bank (2024), and United Nations (2024). The IMF 2026 forecast figures for Germany, France, and Japan were extracted from that table.",
+      "items": [
+        "Germany: 5,452,858 USD millions (IMF, 2026)",
+        "Japan: 4,379,253 USD millions (IMF, 2026)",
+        "France: 3,596,094 USD millions (IMF, 2026)"
+      ],
+      "notes": "The IMF column reflects 2026 forecast/estimate values, not historical actuals. Figures are in millions of US dollars."
+    }
+  },
+  "byllm": {
+    "pattern": "tables",
+    "query": "what is the GDP of Germany, France, and Japan according to the IMF?",
+    "strategy": "preset",
+    "on": "html",
+    "patterns": [
+      "<table\\b[\\s\\S]*?</table>"
+    ],
+    "page_count": 1,
+    "llm_calls": 2,
+    "fetch_hits": 0,
+    "fetch_misses": 1,
+    "blocked_urls": 0,
+    "pages_crawled": 0,
+    "results": [
+      {
+        "source": "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)",
+        "snippets": [
+          "e <a href=\"/wiki/List_of_countries_by_informal_GDP_(nominal)\" title=\"List of countries by informal GDP (nominal)\">List of countries by informal GDP (nominal)</a>.</div>\n<p class=\"mw-empty-elt\">\n\n</p>\n<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" style=\"float:right;\">\n\n<tbody><tr>\n<td><div class=\"timeline-wrapper\"><map name=\"timeline_3rstf1qejcsb9m2ikofjtbn43vh94ct\"></map><img usemap=\"#timeline_3rstf1qejcsb9m2ikofjtbn43vh94ct\" src=\"//upload.wikimedia.org/wikipedia/en/timeline/3rstf1qejcsb9m2ikofjtbn43vh94ct.png\" /></div>\n</td></tr>\n<tr>\n<td style=\"text-align:center; font-size:90%;\">Largest economies in the world by nominal GDP in 2026<br />according to <a href=\"/wiki/International_Monetary_Fund\" title=\"International Monetary Fund\">International Monetary Fund</a> projections<sup id=\"cite&#95;ref-China-THM&#95;1-0\" class=\"reference\"><a href=\"#cite_note-China-THM-1\"><span class=\"cite-bracket\">&#91;</span>n 1<span class=\"cite-bracket\">&#93;</span></a></sup><sup id=\"cite&#95;ref-IMFOCT2025&#95;2-0\" class=\"reference\"><a href=\"#cite_note-IMFOCT2025-2\"><span class=\"cite-bracket\">&#91;</span>1<span class=\"cite-bracket\">&#93;</span></a></sup>\n</td></tr></tbody></table>\n<figure typeof=\"mw:File/Thumb\"><a href=\"/wiki/File:Countries_by_GDP_(nominal)2026.png\" class=\"mw-file-description\"><img src=\"//upload.wikimedia.org/wikipedia/commons/thumb/0/09/Countries_by_GDP_%28no",
+          "ntries by nominal GDP projected for 2026:<sup id=\"cite&#95;ref-3\" class=\"reference\"><a href=\"#cite_note-3\"><span class=\"cite-bracket\">&#91;</span>n 2<span class=\"cite-bracket\">&#93;</span></a></sup>  <table width=\"100%\">  <tbody><tr> <td style=\"vertical-align:top;\"> <style data-mw-deduplicate=\"TemplateStyles:r981673959\">.mw-parser-output .legend{page-break-inside:avoid;break-inside:avoid-column}.mw-parser-output .legend-color{display:inline-block;min-width:1.25em;height:1.25em;line-height:1.25;margin:1px 0;text-align:center;border:1px solid black;background-color:transparent;color:black}.mw-parser-output .legend-text{}</style><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#000203; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;&gt; $20 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#00223a; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$10–20 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#003b63; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$5–10 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#004e83; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$1–5 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#005e9c; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$750 billion – $1 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#0071bd; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$500–750 billion</div> </td> <td style=\"vertical-align:top;\"> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#0088e5; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$250–500 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#109eff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$100–250 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#47b4ff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$50–100 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#74c6ff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$25–50 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#9dd7ff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$5–25 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#ceebff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;&lt; $5 billion</div> </td></tr></tbody></table> </figcaption></figure>\n<p><a href=\"/wiki/Gross_domestic_product\" title=\"Gross domestic product\">Gross domestic product</a> (GDP) is the <a href=\"/wiki/Market_value\" title=\"Market value\">market value<"
+        ]
+      }
+    ],
+    "synthesis": {
+      "summary": "The scraped snippets are from the Wikipedia page 'List of countries by GDP (nominal)' and reference IMF projections for nominal GDP in 2026. However, the actual data table rows containing specific GDP figures for Germany, France, and Japan were not captured in the snippets — only the page structure, legend, and introductory text were included. No concrete GDP values for these three countries are present in the provided text.",
+      "items": [],
+      "notes": "The snippets did not include the actual GDP data table rows for Germany, France, or Japan. To get the specific figures, the full table from https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal) would need to be scraped more completely. Based on IMF data (not from the snippet), Germany is typically around $4.5 trillion, France around $3.1 trillion, and Japan around $4.2 trillion, but these figures cannot be confirmed from the provided snippets alone."
+    }
+  },
+  "direct_byllm": {
+    "pattern": "tables",
+    "query": "what is the GDP of Germany, France, and Japan according to the IMF?",
+    "strategy": "preset",
+    "on": "html",
+    "patterns": [],
+    "results": [
+      {
+        "source": "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)",
+        "snippets": [
+          "Germany | IMF (2026): 5,452,858 million USD | World Bank (2024): 4,685,593 million USD | UN (2024): 4,659,929 million USD",
+          "Japan | IMF (2026): 4,379,253 million USD | World Bank (2024): 4,027,598 million USD | UN (2024): 4,026,211 million USD",
+          "France | IMF (2026): 3,596,094 million USD | World Bank (2024): 3,160,443 million USD | UN (2024): 3,160,443 million USD"
+        ]
+      }
+    ],
+    "synthesis": {
+      "summary": "According to the IMF World Economic Outlook projections for 2026, Germany has a nominal GDP of approximately $5.45 trillion USD, Japan has approximately $4.38 trillion USD, and France has approximately $3.60 trillion USD. These figures are in millions of US dollars as reported on the Wikipedia 'List of countries by GDP (nominal)' page.",
+      "items": [
+        "Germany: $5,452,858 million USD (IMF 2026 estimate)",
+        "Japan: $4,379,253 million USD (IMF 2026 estimate)",
+        "France: $3,596,094 million USD (IMF 2026 estimate)"
+      ],
+      "notes": "The IMF figures shown are projections/estimates for 2026, not current-year actuals. The World Bank and UN figures are for 2024. Taiwan and Hong Kong are listed separately with special notations. GDP values are in millions of US dollars."
+    }
+  },
+  "direct_pipeline": {
+    "pattern": "text",
+    "query": "what is the GDP of Germany, France, and Japan according to the IMF?",
+    "strategy": "preset",
+    "on": "html",
+    "patterns": [
+      "<table\\b[\\s\\S]*?</table>"
+    ],
+    "page_count": 1,
+    "llm_calls": 3,
+    "results": [
+      {
+        "source": "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)",
+        "snippets": [
+          "e <a href=\"/wiki/List_of_countries_by_informal_GDP_(nominal)\" title=\"List of countries by informal GDP (nominal)\">List of countries by informal GDP (nominal)</a>.</div>\n<p class=\"mw-empty-elt\">\n\n</p>\n<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" style=\"float:right;\">\n\n<tbody><tr>\n<td><div class=\"timeline-wrapper\"><map name=\"timeline_3rstf1qejcsb9m2ikofjtbn43vh94ct\"></map><img usemap=\"#timeline_3rstf1qejcsb9m2ikofjtbn43vh94ct\" src=\"//upload.wikimedia.org/wikipedia/en/timeline/3rstf1qejcsb9m2ikofjtbn43vh94ct.png\" /></div>\n</td></tr>\n<tr>\n<td style=\"text-align:center; font-size:90%;\">Largest economies in the world by nominal GDP in 2026<br />according to <a href=\"/wiki/International_Monetary_Fund\" title=\"International Monetary Fund\">International Monetary Fund</a> projections<sup id=\"cite&#95;ref-China-THM&#95;1-0\" class=\"reference\"><a href=\"#cite_note-China-THM-1\"><span class=\"cite-bracket\">&#91;</span>n 1<span class=\"cite-bracket\">&#93;</span></a></sup><sup id=\"cite&#95;ref-IMFOCT2025&#95;2-0\" class=\"reference\"><a href=\"#cite_note-IMFOCT2025-2\"><span class=\"cite-bracket\">&#91;</span>1<span class=\"cite-bracket\">&#93;</span></a></sup>\n</td></tr></tbody></table>\n<figure typeof=\"mw:File/Thumb\"><a href=\"/wiki/File:Countries_by_GDP_(nominal)2026.png\" class=\"mw-file-description\"><img src=\"//upload.wikimedia.org/wikipedia/commons/thumb/0/09/Countries_by_GDP_%28no",
+          "ntries by nominal GDP projected for 2026:<sup id=\"cite&#95;ref-3\" class=\"reference\"><a href=\"#cite_note-3\"><span class=\"cite-bracket\">&#91;</span>n 2<span class=\"cite-bracket\">&#93;</span></a></sup>  <table width=\"100%\">  <tbody><tr> <td style=\"vertical-align:top;\"> <style data-mw-deduplicate=\"TemplateStyles:r981673959\">.mw-parser-output .legend{page-break-inside:avoid;break-inside:avoid-column}.mw-parser-output .legend-color{display:inline-block;min-width:1.25em;height:1.25em;line-height:1.25;margin:1px 0;text-align:center;border:1px solid black;background-color:transparent;color:black}.mw-parser-output .legend-text{}</style><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#000203; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;&gt; $20 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#00223a; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$10–20 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#003b63; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$5–10 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#004e83; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$1–5 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#005e9c; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$750 billion – $1 trillion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#0071bd; color:white;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$500–750 billion</div> </td> <td style=\"vertical-align:top;\"> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#0088e5; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$250–500 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#109eff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$100–250 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#47b4ff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$50–100 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#74c6ff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$25–50 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#9dd7ff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;$5–25 billion</div> <link rel=\"mw-deduplicated-inline-style\" href=\"mw-data:TemplateStyles:r981673959\" /><div class=\"legend\"><span class=\"legend-color mw-no-invert\" style=\"background-color:#ceebff; color:black;-webkit-print-color-adjust: exact; print-color-adjust: exact;\">&#160;</span>&#160;&lt; $5 billion</div> </td></tr></tbody></table> </figcaption></figure>\n<p><a href=\"/wiki/Gross_domestic_product\" title=\"Gross domestic product\">Gross domestic product</a> (GDP) is the <a href=\"/wiki/Market_value\" title=\"Market value\">market value<"
+        ]
+      }
+    ],
+    "synthesis": {
+      "summary": "The scraped snippets reference the Wikipedia list of countries by nominal GDP and mention IMF projections for 2026, but do not contain the specific numerical GDP figures for Germany, France, or Japan in extractable text form. The table data for those countries was not captured in the provided snippets.",
+      "items": [
+        "Germany: GDP figure not available in provided snippets",
+        "France: GDP figure not available in provided snippets",
+        "Japan: GDP figure not available in provided snippets"
+      ],
+      "notes": "The snippets contain only page structure, legend/map markup, and introductory prose from the Wikipedia GDP list page. The actual data table rows with country-level figures were not included in the scraped text. Re-scraping with a focus on the table body content would be needed to extract the specific IMF GDP values for these three countries."
+    }
+  }
+}
