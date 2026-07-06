@@ -12,6 +12,44 @@ RUN_KEYS = [
     ("direct_pipeline",  "Direct Pipeline"),
 ]
 
+_BADGES = {"PASS": "PASS", "FAIL": "FAIL"}
+
+
+def _badge(verdict: str) -> str:
+    return _BADGES.get(verdict, "N/A")
+
+
+def _grade(result: dict) -> dict:
+    grade = result.get("grade", {}) if isinstance(result, dict) else {}
+    return grade if isinstance(grade, dict) else {}
+
+
+def _summary_table(sections: list[tuple[str, dict]]) -> list[str]:
+    lines = ["## Summary\n"]
+    header = ["Test"] + [label for _, label in RUN_KEYS]
+    lines.append("| " + " | ".join(header) + " |")
+    lines.append("|" + "|".join(["---"] * len(header)) + "|")
+
+    totals = {key: 0 for key, _ in RUN_KEYS}
+    total_tests = len(sections)
+
+    for name, d in sections:
+        title = name.replace("_", " ").title()
+        row = [title]
+        for key, _ in RUN_KEYS:
+            verdict = _grade(d.get(key, {})).get("verdict", "")
+            if verdict == "PASS":
+                totals[key] += 1
+            row.append(_badge(verdict))
+        lines.append("| " + " | ".join(row) + " |")
+
+    totals_row = ["**Totals**"] + [
+        f"**{totals[key]}/{total_tests}**" for key, _ in RUN_KEYS
+    ]
+    lines.append("| " + " | ".join(totals_row) + " |")
+    lines.append("")
+    return lines
+
 
 def generate(data_dir: str, output_path: str) -> None:
     pattern = os.path.join(data_dir, "comparison_*.json")
@@ -30,6 +68,7 @@ def generate(data_dir: str, output_path: str) -> None:
     sections.sort(key=lambda x: (x[1].get("category", 99), x[0]))
 
     lines = ["# Comparison Results\n"]
+    lines.extend(_summary_table(sections))
 
     for name, d in sections:
         cat = d.get("category", "?")
@@ -49,8 +88,13 @@ def generate(data_dir: str, output_path: str) -> None:
             if not isinstance(synthesis, dict):
                 synthesis = {}
             items = synthesis.get("items", [])
+            grade = _grade(result)
+            verdict = grade.get("verdict", "")
+            reasoning = grade.get("reasoning", "")
 
-            lines.append(f"### {label}")
+            lines.append(f"### {label} — {_badge(verdict)}")
+            if reasoning:
+                lines.append(f"*{reasoning}*\n")
             lines.append("```")
             if items:
                 for item in items:
