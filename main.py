@@ -11,12 +11,17 @@ _RUN_KEYS = ("direct_anthropic", "byllm", "direct_byllm", "direct_pipeline")
 def _compact(result: dict) -> dict:
     out = {}
     for key in _RUN_KEYS:
-        synthesis = result.get(key, {}).get("synthesis", {})
+        method_result = result.get(key, {})
+        synthesis = method_result.get("synthesis", {})
         if not isinstance(synthesis, dict):
             synthesis = {}
+        grade = method_result.get("grade", {})
+        if not isinstance(grade, dict):
+            grade = {}
         out[key] = {
             "summary": synthesis.get("summary", ""),
             "items": synthesis.get("items", []),
+            "grade": grade,
         }
     return out
 
