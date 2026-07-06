@@ -2,15 +2,15 @@ def preset_table() -> dict[str, str] {
     return {
         # ── structural / HTML ─────────────────────────────────────────────────
         "links":         "<a\\b[^>]*?href=[\"']([^\"']+)[\"']",
-        "links_text":    "<a\\b[^>]*?>([\\s\\S]*?)</a>",
+        "links_text":    "<a\\b[^>]*?>([\\s\\S]*?)(?:</a>|$)",
         "images":        "<img\\b[^>]*?(?:src|data-src|data-lazy|data-lazy-src|data-original|data-img|data-echo|data-srcset)=[\"']([^\"']+)[\"']",
         "iframes":       "<iframe\\b[^>]*?src=[\"']([^\"']+)[\"']",
-        "tables":        "<table\\b[\\s\\S]*?</table>",
-        "headings":      "<h([1-6])\\b[^>]*>([\\s\\S]*?)</h\\1>",
-        "buttons":       "<button\\b[^>]*>([\\s\\S]*?)</button>|<input\\b[^>]*?type=[\"'](?:submit|button)[\"'][^>]*>",
-        "code":          "<(?:code|pre)\\b[^>]*>([\\s\\S]*?)</(?:code|pre)>",
-        "charts":        "<(?:canvas|svg)\\b[\\s\\S]*?</(?:canvas|svg)>",
-        "forms":         "<form\\b[^>]*>[\\s\\S]*?</form>",
+        "tables":        "<table\\b[\\s\\S]*?(?:</table>|$)",
+        "headings":      "<h([1-6])\\b[^>]*>([\\s\\S]*?)(?:</h\\1>|$)",
+        "buttons":       "<button\\b[^>]*>([\\s\\S]*?)(?:</button>|$)|<input\\b[^>]*?type=[\"'](?:submit|button)[\"'][^>]*>",
+        "code":          "<(?:code|pre)\\b[^>]*>([\\s\\S]*?)(?:</(?:code|pre)>|$)",
+        "charts":        "<(?:canvas|svg)\\b[\\s\\S]*?(?:</(?:canvas|svg)>|$)",
+        "forms":         "<form\\b[^>]*>[\\s\\S]*?(?:</form>|$)",
         "scripts":       "<script\\b[^>]*?src=[\"']([^\"']+)[\"']",
         "css":           "<link\\b(?=[^>]*rel=[\"']stylesheet[\"'])[^>]*?href=[\"']([^\"']+)[\"']",
 
@@ -19,7 +19,7 @@ def preset_table() -> dict[str, str] {
         "video_embeds":  "<iframe\\b[^>]*?src=[\"']([^\"']*(?:youtube\\.com/embed|youtu\\.be|player\\.vimeo\\.com|dailymotion\\.com/embed|player\\.twitch\\.tv|loom\\.com/embed|wistia\\.com/embed)[^\"']*)[\"']",
 
         # ── structured / semantic metadata ────────────────────────────────────
-        "jsonld":        "<script\\b[^>]*application/ld\\+json[^>]*>([\\s\\S]*?)</script>",
+        "jsonld":        "<script\\b[^>]*application/ld\\+json[^>]*>([\\s\\S]*?)(?:</script>|$)",
         "metadata":      "<meta\\b[^>]*?(?:name|property)=[\"']([^\"']+)[\"'][^>]*?content=[\"']([^\"']*)[\"']",
 
         # ── contact / entity ─────────────────────────────────────────────────
