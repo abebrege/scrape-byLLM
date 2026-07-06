@@ -171,6 +171,71 @@ def via_direct_pipeline(params: ComparisonParams, synthesis_schema: str) -> dict
     }
 
 
+GRADE_SCHEMA = (
+    "Return ONLY a JSON object with:\n"
+    "  grades: list of objects, one per method, each with:\n"
+    "    name: string, the method name exactly as given (e.g. 'direct_anthropic')\n"
+    "    verdict: string, exactly 'PASS' or 'FAIL'\n"
+    "    reasoning: string, one concise sentence justifying the verdict\n"
+    "No markdown, no explanation outside the JSON — raw JSON only."
+)
+
+_GRADE_KEYS = ("direct_anthropic", "byllm", "direct_byllm", "direct_pipeline")
+
+
+def _method_output_text(result: dict) -> str:
+    synthesis = result.get("synthesis", {}) if isinstance(result, dict) else {}
+    if not isinstance(synthesis, dict):
+        synthesis = {}
+    items = synthesis.get("items", [])
+    if items:
+        return "\n".join(str(item) for item in items)
+    return "(no items returned)"
+
+
+def grade_methods(params: ComparisonParams, result: dict) -> list[dict]:
+    """Grade every method's output for this comparison in a single LLM call,
+    rather than one call per method."""
+    methods_block = "\n\n".join(
+        f"### {key}\n{_method_output_text(result.get(key, {}))}"
+        for key in _GRADE_KEYS
+    )
+    prompt = (
+        "You are grading web-scraping extraction outputs from a known failure-mode test case.\n\n"
+        f"Query: {params.query}\n"
+        f"What correct behavior looks like: {params.description}\n\n"
+        "Below are the outputs of four independent extraction methods for the same query. "
+        "Grade each PASS or FAIL: PASS means the method returned the semantically correct answer "
+        "and avoided the failure mode described above; FAIL means it fabricated data, returned the "
+        "wrong value, or otherwise fell into the described failure mode — even if the output looks "
+        "structurally well-formed.\n\n"
+        f"{methods_block}\n\n"
+        f"{GRADE_SCHEMA}"
+    )
+    data = _llm_json(prompt, max_tokens=2048)
+    grades = data.get("grades", [])
+    return grades if isinstance(grades, list) else []
+
+
+def merge_grades(result: dict, grades: list[dict]) -> dict:
+    """Fold grade verdicts back into each method's result object in place."""
+    by_name = {
+        str(g["name"]): g
+        for g in grades
+        if isinstance(g, dict) and g.get("name")
+    }
+
+    for key in _GRADE_KEYS:
+        grade = by_name.get(key, {})
+        method_result = result.get(key)
+        if isinstance(method_result, dict):
+            method_result["grade"] = {
+                "verdict": str(grade.get("verdict", "UNKNOWN")),
+                "reasoning": str(grade.get("reasoning", "")),
+            }
+    return result
+
+
 def run_comparison(params: ComparisonParams, verbose: bool = False) -> dict:
     synthesis_schema, output_schema = _build_schemas(params)
 
@@ -190,7 +255,7 @@ def run_comparison(params: ComparisonParams, verbose: bool = False) -> dict:
         print("  [4/4] direct pipeline...")
     pipeline_result = via_direct_pipeline(params, synthesis_schema)
 
-    return {
+    result = {
         "url": params.url,
         "query": params.query,
         "model": MODEL,
@@ -202,3 +267,10 @@ def run_comparison(params: ComparisonParams, verbose: bool = False) -> dict:
         "direct_byllm": direct_byllm_result,
         "direct_pipeline": pipeline_result,
     }
+
+    if verbose:
+        print("  [grading] scoring outputs against description...")
+    grades = grade_methods(params, result)
+    merge_grades(result, grades)
+
+    return result
