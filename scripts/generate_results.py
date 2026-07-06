@@ -1,4 +1,3 @@
-"""Generate RESULTS.md from a directory of comparison_*.json output files."""
 import argparse
 import glob
 import json
